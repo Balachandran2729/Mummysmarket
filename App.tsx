@@ -1,14 +1,16 @@
 import { StatusBar } from 'expo-status-bar';
-import { Text, View } from 'react-native';
-
+import { Provider } from 'react-redux';
+import { NavigationContainer } from '@react-navigation/native';
+import { store } from './src/core/redux';
+import { AppNavigator } from './src/core/navigation/TabNavigation';
 
 export default function App() {
   return (
-    <View className="flex-1">
-      <StatusBar style="auto" />  
-        <Text className="text-2xl font-bold text-white">
-          MummysMarket
-        </Text>
-    </View>
+    <Provider store={store}>
+      <NavigationContainer>
+        <StatusBar style="auto" />
+        <AppNavigator />
+      </NavigationContainer>
+    </Provider>
   );
 }
