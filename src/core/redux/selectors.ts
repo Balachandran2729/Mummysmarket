@@ -23,3 +23,11 @@ export const selectCartQuantity = (id: number) => (state: RootState) =>
   state.cart.items.find((i) => i.product.id === id)?.quantity ?? 0;
 export const selectCartCount = (state: RootState) =>
   state.cart.items.reduce((sum, i) => sum + i.quantity, 0);
+
+// ...keep everything already there, add:
+
+export const selectCartItems = (state: RootState) => state.cart.items;
+export const selectCartTotal = (state: RootState) =>
+  state.cart.items.reduce((sum, i) => sum + i.product.price * i.quantity, 0);
+
+export const selectFavoriteItems = (state: RootState) => state.favorites.items;

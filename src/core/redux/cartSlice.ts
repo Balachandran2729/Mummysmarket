@@ -30,13 +30,23 @@ const cartSlice = createSlice({
         state.items.push({ product: action.payload, quantity: 1 });
       }
     },
+    decreaseQuantityInState(state, action: PayloadAction<number>) {
+      const existing = state.items.find((i) => i.product.id === action.payload);
+      if (!existing) return;
+      if (existing.quantity <= 1) {
+        state.items = state.items.filter((i) => i.product.id !== action.payload);
+      } else {
+        existing.quantity -= 1;
+      }
+    },
     removeFromCartInState(state, action: PayloadAction<number>) {
       state.items = state.items.filter((i) => i.product.id !== action.payload);
     },
   },
 });
 
-export const { setCart, addToCartInState, removeFromCartInState } = cartSlice.actions;
+export const { setCart, addToCartInState, decreaseQuantityInState, removeFromCartInState } =
+  cartSlice.actions;
 export default cartSlice.reducer;
 
 export const loadCart = () => async (dispatch: AppDispatch) => {
@@ -60,6 +70,12 @@ const persistCart = async (getState: () => RootState) => {
 export const addToCart =
   (product: Product) => async (dispatch: AppDispatch, getState: () => RootState) => {
     dispatch(addToCartInState(product));
+    await persistCart(getState);
+  };
+
+export const decreaseQuantity =
+  (productId: number) => async (dispatch: AppDispatch, getState: () => RootState) => {
+    dispatch(decreaseQuantityInState(productId));
     await persistCart(getState);
   };
 

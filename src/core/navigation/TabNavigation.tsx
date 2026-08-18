@@ -20,7 +20,7 @@ const TabNavigation = () => {
         headerShown: false,
         tabBarShowLabel: false,
         tabBarStyle: {
-          backgroundColor: 'transparent',
+          backgroundColor: COLORS.surface,
           position: 'absolute',
           bottom: 0,
           left: 0,
@@ -39,7 +39,7 @@ const TabNavigation = () => {
               <AntDesign
                 name="home"
                 size={26}
-                color={focused ? '#36C8B3' : COLORS.primaryDark}
+                color={ COLORS.primaryDark}
               />
             </View>
           ),
@@ -54,7 +54,7 @@ const TabNavigation = () => {
               <MaterialIcons
                 name="add-shopping-cart"
                 size={26}
-                color={focused ? '#36C8B3' : COLORS.primaryDark}
+                color={COLORS.primaryDark}
               />
             </View>
           ),

@@ -120,7 +120,7 @@ const ProductDetails = () => {
       </ScrollView>
 
       <View
-        className="absolute bottom-0 left-0 right-0 flex-row items-center px-4 py-3"
+        className="absolute bottom-0 left-0 right-0 flex-row items-center px-4 py-3 mb-4"
         style={{ backgroundColor: COLORS.surface, borderTopWidth: 1, borderTopColor: COLORS.border }}
       >
         <TouchableOpacity
