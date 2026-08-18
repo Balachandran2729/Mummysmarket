@@ -30,6 +30,7 @@ export const fetchProducts = createAsyncThunk<
       const validatedData = ProductsResponseSchema.parse(response.data);
       return validatedData;
     } catch (error) {
+      console.log('fetchProducts error:', error);
       if (axios.isAxiosError(error)) {
         return rejectWithValue(
           error.response?.data?.message || error.message || 'Failed to fetch products'
@@ -62,8 +63,15 @@ const productSlice = createSlice({
       // Fetch Products - Fulfilled
       .addCase(fetchProducts.fulfilled, (state, action) => {
         state.loading = false;
-        state.data = action.payload;
         state.error = null;
+        if (action.payload.skip === 0 || !state.data) {
+          state.data = action.payload;
+        } else {
+          state.data = {
+            ...action.payload,
+            products: [...(state.data.products || []), ...action.payload.products],
+          };
+        }
       })
       // Fetch Products - Rejected
       .addCase(fetchProducts.rejected, (state, action) => {
