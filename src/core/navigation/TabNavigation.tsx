@@ -4,14 +4,16 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator , TransitionPresets } from '@react-navigation/stack';
 import { AntDesign, MaterialIcons } from '@expo/vector-icons';
 import { COLORS } from '../common/colour';
+import type { AppStackParamList } from './types';
 
 import HomeScreen from '../../feature/home/HomeScreen';
 import CartScreen from '../../feature/cart/CartScreen';
 import ProductDetails from '../../feature/home/ProdectDetails';
 import SaveProduct from '../../feature/cart/SaveProdect';
+import Login from '../../feature/login/Login';
 
 const Tab = createBottomTabNavigator();
-const AppStack = createStackNavigator<any>();
+const AppStack = createStackNavigator<AppStackParamList>();
 
 const TabNavigation = () => {
   return (
@@ -72,6 +74,7 @@ const AppNavigator = () => {
         headerShown: false,
       }}
     >
+      <AppStack.Screen name="Login" component={Login} />
       <AppStack.Screen name="MainTabs" component={TabNavigation} />
       <AppStack.Screen
         name="ProductDetails"

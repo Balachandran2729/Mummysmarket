@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, Image, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -12,6 +12,7 @@ import {
   productSelectors,
 } from '../../core/redux';
 import type { AppStackParamList } from '../../core/navigation/types';
+import { usePostHog } from 'posthog-react-native';
 
 type ProductDetailsRouteProp = RouteProp<AppStackParamList, 'ProductDetails'>;
 
@@ -19,6 +20,24 @@ const ProductDetails = () => {
   const navigation = useNavigation();
   const route = useRoute<ProductDetailsRouteProp>();
   const { product } = route.params;
+  const posthog = usePostHog();
+
+  useEffect(() => {
+    const openedAt = Date.now();
+
+     posthog.screen('ProductDetails');
+
+    return () => {
+      const durationMs = Date.now() - openedAt;
+      posthog.capture('screen_duration', {
+        screen_name: 'ProductDetails',
+        product_id: product.id,
+        product_title: product.title,
+        duration_ms: durationMs,
+        duration_seconds: Math.round(durationMs / 1000),
+      });
+    };
+  }, [posthog, product.id, product.title]);
 
   const dispatch = useAppDispatch();
   const isFavorite = useAppSelector(productSelectors.selectIsFavorite(product.id));

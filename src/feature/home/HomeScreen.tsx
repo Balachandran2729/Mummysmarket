@@ -22,6 +22,7 @@ import {
 import type { Product } from '../../core/redux';
 import ProductCard from './ProductCard';
 import SkeletonCard from './SkeletonCard';
+import { usePostHog } from 'posthog-react-native';
 
 const LIMIT = 15;
 
@@ -37,11 +38,28 @@ const HomeScreen = () => {
   const [search, setSearch] = useState('');
   const isFetchingRef = useRef(false);
 
+  const posthog = usePostHog();
+
   useEffect(() => {
-    dispatch(fetchProducts({ limit: LIMIT, skip: 0 }));
-    dispatch(loadFavorites());
-    dispatch(loadCart());
-  }, [dispatch]);
+  const openedAt = Date.now();
+
+  // Track screen view
+  posthog.screen('HomeScreen');
+
+  dispatch(fetchProducts({ limit: LIMIT, skip: 0 }));
+  dispatch(loadFavorites());
+  dispatch(loadCart());
+
+  return () => {
+    const durationMs = Date.now() - openedAt;
+
+    posthog.capture('screen_duration', {
+      screen_name: 'HomeScreen',
+      duration_ms: durationMs,
+      duration_seconds: Math.round(durationMs / 1000),
+    });
+  };
+}, [dispatch, posthog]);
 
   const isInitialLoading = loading && products.length === 0;
   const hasMore = total === 0 || products.length < total;
@@ -72,6 +90,14 @@ const HomeScreen = () => {
       (p) => p.title.toLowerCase().includes(q) || p.category.toLowerCase().includes(q)
     );
   }, [products, search]);
+
+  const handlePress = () => {
+      posthog.capture('Cart_button_clicked',{
+      category: 'travel',
+      has_image: true,
+    });
+      console.log('Cart button pressed');
+  };
 
   const renderFooter = () => {
     if (search.trim().length > 0) return null;
@@ -123,6 +149,7 @@ const HomeScreen = () => {
         <TouchableOpacity
           className="absolute right-4 top-2.5 w-9 h-9 rounded-full items-center justify-center"
           style={{ backgroundColor: COLORS.primaryLight }}
+          onPress={handlePress}
         >
           <Ionicons name="cart-outline" size={18} color={COLORS.primaryDark} />
           {cartCount > 0 && (

@@ -13,6 +13,7 @@ import {
 } from '../../core/redux';
 import type { Product } from '../../core/redux';
 import type { AppStackParamList } from '../../core/navigation/types';
+import { usePostHog } from 'posthog-react-native';
 
 interface ProductCardProps {
   product: Product;
@@ -25,15 +26,27 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const dispatch = useAppDispatch();
   const isFavorite = useAppSelector(productSelectors.selectIsFavorite(product.id));
   const cartQty = useAppSelector(productSelectors.selectCartQuantity(product.id));
+  const posthog = usePostHog();
 
   const hasDiscount = product.discountPercentage > 0;
-  const discountedPrice =
-    product.price - (product.price * product.discountPercentage) / 100;
+  const discountedPrice = product.price - (product.price * product.discountPercentage) / 100;
+
+    const handlePress = (product: Product) => {
+
+      posthog.capture('ProductCard_clicked', {
+      product_id: product.id,
+      product_title: product.title,
+      product_category: product.category,
+      });
+      console.log('Product Pressed...')
+      navigation.navigate('ProductDetails', { product })
+
+    }
 
   return (
     <TouchableOpacity
       activeOpacity={0.9}
-      onPress={() => navigation.navigate('ProductDetails', { product })}
+      onPress={() => handlePress(product)}
       className="rounded-2xl mb-4 overflow-hidden"
       style={{
         backgroundColor: COLORS.surface,
