@@ -1,6 +1,12 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+import { Platform } from 'react-native';
 import { ProductsResponse, ProductsResponseSchema } from './datatype';
+
+const DEFAULT_API_BASE_URL = `http://${Platform.OS === 'android' ? '10.0.2.2' : 'localhost'}`;
+const API_BASE_URL = (process.env.EXPO_PUBLIC_API_BASE_URL ?? DEFAULT_API_BASE_URL).replace(/\/$/, '');
+const PRODUCTS_URL = `${API_BASE_URL}/drupal/web/api/user-crud/get-apps-data`;
 
 interface ProductState {
   data: ProductsResponse | null;
@@ -22,8 +28,15 @@ export const fetchProducts = createAsyncThunk<
   'products/fetchProducts',
   async ({ limit = 10, skip = 0 }, { rejectWithValue }) => {
     try {
+      const accessToken = await AsyncStorage.getItem('access_token');
       const response = await axios.get<ProductsResponse>(
-        `https://dummyjson.com/products?limit=${limit}&skip=${skip}`
+        PRODUCTS_URL,
+        {
+          params: { limit, skip },
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
       );
 
       // Validate response with Zod schema
