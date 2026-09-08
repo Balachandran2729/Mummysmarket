@@ -1,3 +1,5 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 import React, { useState } from 'react';
 import {
   KeyboardAvoidingView,
@@ -12,41 +14,55 @@ import { usePostHog } from 'posthog-react-native';
 import type { StackScreenProps } from '@react-navigation/stack';
 import type { AppStackParamList } from '../../core/navigation/types';
 import { COLORS } from '../../core/common/colour';
+import { login } from './loginApi';
 
 type LoginProps = StackScreenProps<AppStackParamList, 'Login'>;
+
+const ACCESS_TOKEN_KEY = 'access_token';
+const REFRESH_TOKEN_KEY = 'refresh_token';
 
 const Login = ({ navigation }: LoginProps) => {
   const posthog = usePostHog();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleLogin = () => {
-    if (username !== 'Admin123' || password !== 'Admin@123') {
-      setError('Enter the test username and password.');
+  const handleLogin = async () => {
+    if (!username.trim() || !password) {
+      setError('Enter your username and password.');
       return;
     }
 
-    const user = {
-      id: username,
-      email: 'admin@mummysmarket.test',
-      name: 'Admin',
-    };
+    setError('');
+    setIsLoading(true);
 
-    posthog.identify(user.id, {
-      email: user.email,
-      name: user.name,
-    });
+    try {
+      const response = await login(username.trim(), password);
 
-    posthog.capture('User_logged_in', {
-      user_id: user.id,
-      email: user.email,
-      name: user.name,
-    });
+      await AsyncStorage.multiSet([
+        [ACCESS_TOKEN_KEY, response.access_token],
+        [REFRESH_TOKEN_KEY, response.refresh_token],
+      ]);
 
-    console.log('User logged in');
-
-    navigation.replace('MainTabs');
+      posthog.identify(username.trim());
+      posthog.capture('User_logged_in', { user_id: username.trim() });
+      navigation.replace('MainTabs');
+    } catch (requestError) {
+      if (axios.isAxiosError(requestError)) {
+        const apiMessage = requestError.response?.data?.message;
+        setError(
+          apiMessage ||
+            (requestError.code === 'ERR_NETWORK'
+              ? 'Cannot reach the login server. Check that Drupal is running and the device is on the same network.'
+              : 'Unable to log in. Check your credentials and try again.'),
+        );
+      } else {
+        setError('Unable to log in. Check your credentials and try again.');
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -93,10 +109,11 @@ const Login = ({ navigation }: LoginProps) => {
 
           <TouchableOpacity
             onPress={handleLogin}
+            disabled={isLoading}
             className="mt-6 items-center rounded-xl py-3"
-            style={{ backgroundColor: COLORS.primary }}
+            style={{ backgroundColor: COLORS.primary, opacity: isLoading ? 0.7 : 1 }}
           >
-            <Text className="font-semibold text-white">Log in</Text>
+            <Text className="font-semibold text-white">{isLoading ? 'Logging in...' : 'Log in'}</Text>
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
