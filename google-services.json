@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "727760112415",
+    "project_id": "mummysmarket",
+    "storage_bucket": "mummysmarket.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:727760112415:android:d68521967d0496805fbe2a",
+        "android_client_info": {
+          "package_name": "com.chandru2729.MummysMarket"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAC2CacHriJGgnJa4I-nYF4weNAdDNQofk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

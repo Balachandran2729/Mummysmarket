@@ -5,7 +5,8 @@ const API_BASE_URL = getApiBaseUrl();
 const LOGIN_URL = `${API_BASE_URL}/drupal/web/api/user-crud/user-login`;
 
 export type LoginResponse = {
-  message: string;
+  message?: string;
+  error?: string;
   access_token: string;
   refresh_token: string;
 };
@@ -23,7 +24,12 @@ export const login = async (name: string, password: string): Promise<LoginRespon
   );
 
   if (!response.data?.access_token || !response.data?.refresh_token) {
-    throw new Error('Login response did not contain access and refresh tokens.');
+    const apiMessage =
+      response.data?.message ||
+      response.data?.error ||
+      'Login response did not contain access and refresh tokens.';
+
+    throw new Error(apiMessage);
   }
 
   return response.data;

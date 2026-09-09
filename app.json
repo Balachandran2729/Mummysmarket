@@ -22,7 +22,8 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.chandru2729.MummysMarket"
+      "package": "com.chandru2729.MummysMarket",
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
       "favicon": "./assets/favicon.png",
@@ -30,7 +31,14 @@
     },
     "plugins": [
       "expo-font",
-      "expo-localization"
-    ]
+      "expo-localization",
+      "expo-notifications"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "7c604a79-19ac-49f0-80c0-f9b394aa218f"
+      }
+    },
+    "owner": "chandru2729"
   }
 }

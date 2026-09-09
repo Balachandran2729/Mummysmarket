@@ -15,11 +15,14 @@ import type { StackScreenProps } from '@react-navigation/stack';
 import type { AppStackParamList } from '../../core/navigation/types';
 import { COLORS } from '../../core/common/colour';
 import { login } from './loginApi';
+import { registerDeviceToken, registerForPushNotificationsAsync } from '../../core/services/notificationService';
 
 type LoginProps = StackScreenProps<AppStackParamList, 'Login'>;
 
 const ACCESS_TOKEN_KEY = 'access_token';
 const REFRESH_TOKEN_KEY = 'refresh_token';
+const USER_NAME_KEY = 'user_name';
+const USER_ID_KEY = 'user_id';
 
 const Login = ({ navigation }: LoginProps) => {
   const posthog = usePostHog();
@@ -40,23 +43,40 @@ const Login = ({ navigation }: LoginProps) => {
     try {
       const response = await login(username.trim(), password);
 
+      const normalizedUsername = username.trim();
+
       await AsyncStorage.multiSet([
         [ACCESS_TOKEN_KEY, response.access_token],
         [REFRESH_TOKEN_KEY, response.refresh_token],
+        [USER_NAME_KEY, normalizedUsername],
+        [USER_ID_KEY, normalizedUsername],
       ]);
 
-      posthog.identify(username.trim());
-      posthog.capture('User_logged_in', { user_id: username.trim() });
+      try {
+        const token = await registerForPushNotificationsAsync();
+
+        if (token) {
+          await registerDeviceToken(token);
+        }
+      } catch (notificationError) {
+        console.log('Push notification registration skipped:', notificationError);
+      }
+
+      posthog.identify(normalizedUsername);
+      posthog.capture('User_logged_in', { user_id: normalizedUsername });
       navigation.replace('MainTabs');
     } catch (requestError) {
       if (axios.isAxiosError(requestError)) {
-        const apiMessage = requestError.response?.data?.message;
+        const apiMessage = requestError.response?.data?.message || requestError.response?.data?.error;
+
         setError(
           apiMessage ||
             (requestError.code === 'ERR_NETWORK'
               ? 'Cannot reach the login server. Check that Drupal is running and the device is on the same network.'
               : 'Unable to log in. Check your credentials and try again.'),
         );
+      } else if (requestError instanceof Error && requestError.message) {
+        setError(requestError.message);
       } else {
         setError('Unable to log in. Check your credentials and try again.');
       }
