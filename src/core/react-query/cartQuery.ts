@@ -1,11 +1,10 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
-import { Platform } from 'react-native';
 import { QueryClient } from '@tanstack/react-query';
 import { useQuery } from '@tanstack/react-query';
+import { getApiBaseUrl } from '../common/api';
 
-const DEFAULT_API_BASE_URL = `http://${Platform.OS === 'android' ? '10.0.2.2' : 'localhost'}`;
-const API_BASE_URL = (process.env.EXPO_PUBLIC_API_BASE_URL ?? DEFAULT_API_BASE_URL).replace(/\/$/, '');
+const API_BASE_URL = getApiBaseUrl();
 const CART_GET_URL = `${API_BASE_URL}/drupal/web/api/user-crud/get-cart-apps-data`;
 
 export type CartApiItem = {

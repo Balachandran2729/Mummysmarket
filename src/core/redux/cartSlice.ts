@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getApiBaseUrl } from '../common/api';
 import type { Product } from './datatype';
 import type { AppDispatch, RootState } from './store';
 import { fetchProducts } from './productSlice';
@@ -22,7 +23,7 @@ interface CartState {
 
 const initialState: CartState = { items: [] };
 
-const cartApiBaseUrl = 'http://localhost/drupal/web/api/user-crud';
+const cartApiBaseUrl = `${getApiBaseUrl()}/drupal/web/api/user-crud`;
 
 const buildFallbackProduct = (item: CartApiItem): Product => ({
   id: item.id,
