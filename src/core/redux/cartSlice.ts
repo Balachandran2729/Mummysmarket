@@ -1,7 +1,15 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { Product } from './datatype';
 import type { AppDispatch, RootState } from './store';
+import { fetchProducts } from './productSlice';
+import {
+  cartQueryKeys,
+  queryClient,
+  type CartApiItem,
+  fetchCartApi,
+} from '../react-query/cartQuery';
 
 export interface CartItem {
   product: Product;
@@ -13,7 +21,41 @@ interface CartState {
 }
 
 const initialState: CartState = { items: [] };
-const CART_KEY = '@mummysmarket/cart';
+
+const cartApiBaseUrl = 'http://localhost/drupal/web/api/user-crud';
+
+const buildFallbackProduct = (item: CartApiItem): Product => ({
+  id: item.id,
+  title: item.title,
+  description: '',
+  category: '',
+  price: 0,
+  discountPercentage: 0,
+  rating: 0,
+  stock: 0,
+  tags: [],
+  brand: '',
+  sku: '',
+  weight: 0,
+  dimensions: { width: 0, height: 0, depth: 0 },
+  reviews: [],
+  thumbnail: item.image,
+  images: [item.image],
+});
+
+const mapCartItem = (item: CartApiItem, products: Product[] = []): CartItem => {
+  const matchingProduct = products.find((product) => product.id === item.id);
+
+  return {
+    product: {
+      ...(matchingProduct ?? buildFallbackProduct(item)),
+      title: item.title,
+      thumbnail: item.image || matchingProduct?.thumbnail || '',
+      images: matchingProduct?.images ?? [item.image],
+    },
+    quantity: item.count,
+  };
+};
 
 const cartSlice = createSlice({
   name: 'cart',
@@ -49,38 +91,108 @@ export const { setCart, addToCartInState, decreaseQuantityInState, removeFromCar
   cartSlice.actions;
 export default cartSlice.reducer;
 
-export const loadCart = () => async (dispatch: AppDispatch) => {
+export const loadCart = () => async (dispatch: AppDispatch, getState: () => RootState) => {
   try {
-    const raw = await AsyncStorage.getItem(CART_KEY);
-    if (raw) dispatch(setCart(JSON.parse(raw)));
+    const response = await queryClient.fetchQuery({
+      queryKey: cartQueryKeys.list(),
+      queryFn: fetchCartApi,
+    });
+
+    let products = getState().products.data?.products ?? [];
+
+    if (products.length === 0) {
+      const productResponse = await dispatch(fetchProducts({ limit: 1000, skip: 0 })).unwrap();
+      products = productResponse.products ?? [];
+    }
+
+    const mappedItems = response.cart.map((item) => mapCartItem(item, products));
+
+    dispatch(setCart(mappedItems));
   } catch (e) {
-    console.log('Failed to load cart', e);
+    console.log('Failed to load cart from API', e);
   }
 };
 
-const persistCart = async (getState: () => RootState) => {
-  try {
-    const { cart } = getState();
-    await AsyncStorage.setItem(CART_KEY, JSON.stringify(cart.items));
-  } catch (e) {
-    console.log('Failed to persist cart', e);
-  }
+const getAuthHeaders = async () => {
+  const accessToken = await AsyncStorage.getItem('access_token');
+
+  return {
+    Authorization: `Bearer ${accessToken}`,
+  };
+};
+
+const createCartItemPayload = (product: Product) => ({
+  id: product.id,
+  title: product.title,
+  image: product.thumbnail ?? product.images?.[0] ?? '',
+});
+
+const syncCartAfterMutation = async (dispatch: AppDispatch) => {
+  await queryClient.invalidateQueries({ queryKey: cartQueryKeys.list() });
+  await dispatch(loadCart());
 };
 
 export const addToCart =
   (product: Product) => async (dispatch: AppDispatch, getState: () => RootState) => {
-    dispatch(addToCartInState(product));
-    await persistCart(getState);
+    try {
+      const headers = await getAuthHeaders();
+      const existingItem = getState().cart.items.find((item) => item.product.id === product.id);
+
+      if (existingItem) {
+        await axios.patch(
+          `${cartApiBaseUrl}/update-cart-apps-data/${product.id}`,
+          { count: existingItem.quantity + 1 },
+          { headers }
+        );
+      } else {
+        await axios.post(
+          `${cartApiBaseUrl}/create-cart-apps-data`,
+          createCartItemPayload(product),
+          { headers }
+        );
+      }
+
+      await syncCartAfterMutation(dispatch);
+    } catch (e) {
+      console.log('Failed to add cart item to API', e);
+    }
   };
 
 export const decreaseQuantity =
   (productId: number) => async (dispatch: AppDispatch, getState: () => RootState) => {
-    dispatch(decreaseQuantityInState(productId));
-    await persistCart(getState);
+    try {
+      const currentItem = getState().cart.items.find((item) => item.product.id === productId);
+
+      if (!currentItem) {
+        return;
+      }
+
+      const headers = await getAuthHeaders();
+
+      if (currentItem.quantity <= 1) {
+        await axios.delete(`${cartApiBaseUrl}/delete-cart-apps-data/${productId}`, { headers });
+      } else {
+        await axios.patch(
+          `${cartApiBaseUrl}/update-cart-apps-data/${productId}`,
+          { count: currentItem.quantity - 1 },
+          { headers }
+        );
+      }
+
+      await syncCartAfterMutation(dispatch);
+    } catch (e) {
+      console.log('Failed to decrease cart item quantity', e);
+    }
   };
 
 export const removeFromCart =
-  (productId: number) => async (dispatch: AppDispatch, getState: () => RootState) => {
-    dispatch(removeFromCartInState(productId));
-    await persistCart(getState);
+  (productId: number) => async (dispatch: AppDispatch) => {
+    try {
+      const headers = await getAuthHeaders();
+      await axios.delete(`${cartApiBaseUrl}/delete-cart-apps-data/${productId}`, { headers });
+
+      await syncCartAfterMutation(dispatch);
+    } catch (e) {
+      console.log('Failed to remove cart item from API', e);
+    }
   };

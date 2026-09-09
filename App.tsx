@@ -1,10 +1,11 @@
 import { StatusBar } from 'expo-status-bar';
 import { Provider } from 'react-redux';
 import { NavigationContainer } from '@react-navigation/native';
+import { QueryClientProvider } from '@tanstack/react-query';
 import { store } from './src/core/redux';
 import { AppNavigator } from './src/core/navigation/TabNavigation';
 import { PostHogProvider } from 'posthog-react-native';
-
+import { queryClient } from './src/core/react-query/cartQuery';
 
 export default function App() {
   return (
@@ -15,10 +16,12 @@ export default function App() {
       }}
     >
       <Provider store={store}>
-        <NavigationContainer>
-          <StatusBar style="auto" />
-          <AppNavigator />
-        </NavigationContainer>
+        <QueryClientProvider client={queryClient}>
+          <NavigationContainer>
+            <StatusBar style="auto" />
+            <AppNavigator />
+          </NavigationContainer>
+        </QueryClientProvider>
       </Provider>
     </PostHogProvider>
   );
