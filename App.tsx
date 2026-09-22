@@ -11,8 +11,18 @@ import {
   registerDeviceToken,
   registerForPushNotificationsAsync,
 } from './src/core/services/notificationService';
+import * as Notifications from 'expo-notifications';
 
 export default function App() {
+
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowBanner: true,
+      shouldShowList: true,
+      shouldPlaySound: true,
+      shouldSetBadge: false,
+    }),
+  });
 
   useEffect(() => {
     registerForPushNotificationsAsync()

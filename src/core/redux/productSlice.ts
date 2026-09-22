@@ -76,7 +76,8 @@ const productSlice = createSlice({
       .addCase(fetchProducts.fulfilled, (state, action) => {
         state.loading = false;
         state.error = null;
-        if (action.payload.skip === 0 || !state.data) {
+        const skip = action.meta.arg.skip ?? 0;
+        if (skip === 0 || !state.data) {
           state.data = action.payload;
         } else {
           state.data = {

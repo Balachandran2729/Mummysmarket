@@ -45,6 +45,8 @@ const Login = ({ navigation }: LoginProps) => {
 
       const normalizedUsername = username.trim();
 
+      posthog.reset();
+
       await AsyncStorage.multiSet([
         [ACCESS_TOKEN_KEY, response.access_token],
         [REFRESH_TOKEN_KEY, response.refresh_token],

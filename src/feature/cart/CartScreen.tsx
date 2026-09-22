@@ -19,10 +19,26 @@ import type { AppStackParamList } from '../../core/navigation/types';
 
 type NavigationProp = StackNavigationProp<AppStackParamList>;
 
+const getFirstPhoto = (photos: string): string | undefined => {
+  try {
+    const parsed = JSON.parse(photos);
+    if (Array.isArray(parsed) && parsed.length > 0) {
+      // API sometimes leaves a trailing comma inside the URL string
+      return String(parsed[0]).replace(/,+$/, '').trim();
+    }
+  } catch {
+    // ignore malformed photos
+  }
+  return undefined;
+};
+
 const CartRow: React.FC<{ item: CartItem }> = React.memo(({ item }) => {
   const navigation = useNavigation<NavigationProp>();
   const dispatch = useAppDispatch();
   const { product, quantity } = item;
+
+  const thumbnail = getFirstPhoto(product.photos);
+  const offerPrice = parseFloat(product.offer_price);
 
   return (
     <TouchableOpacity
@@ -32,7 +48,7 @@ const CartRow: React.FC<{ item: CartItem }> = React.memo(({ item }) => {
       style={{ backgroundColor: COLORS.surface, borderWidth: 1, borderColor: COLORS.borderLight }}
     >
       <Image
-        source={{ uri: product.thumbnail }}
+        source={{ uri: thumbnail }}
         className="w-20 h-20 rounded-xl"
         resizeMode="cover"
         style={{ backgroundColor: COLORS.borderLight }}
@@ -44,7 +60,7 @@ const CartRow: React.FC<{ item: CartItem }> = React.memo(({ item }) => {
             {product.title}
           </Text>
           <Text className="text-base font-bold mt-1" style={{ color: COLORS.primary }}>
-            ${product.price.toFixed(2)}
+            ₹{offerPrice.toFixed(2)}
           </Text>
         </View>
 
@@ -147,7 +163,7 @@ const CartScreen = () => {
                 Total ({cartItems.reduce((s, i) => s + i.quantity, 0)} items)
               </Text>
               <Text className="text-xl font-bold" style={{ color: COLORS.text }}>
-                ${total.toFixed(2)}
+                ₹{total.toFixed(2)}
               </Text>
             </View>
             <TouchableOpacity

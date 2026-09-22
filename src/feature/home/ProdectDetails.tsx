@@ -16,6 +16,19 @@ import { usePostHog } from 'posthog-react-native';
 
 type ProductDetailsRouteProp = RouteProp<AppStackParamList, 'ProductDetails'>;
 
+const getFirstPhoto = (photos: string): string | undefined => {
+  try {
+    const parsed = JSON.parse(photos);
+    if (Array.isArray(parsed) && parsed.length > 0) {
+      // API sometimes leaves a trailing comma inside the URL string
+      return String(parsed[0]).replace(/,+$/, '').trim();
+    }
+  } catch {
+    // ignore malformed photos
+  }
+  return undefined;
+};
+
 const ProductDetails = () => {
   const navigation = useNavigation();
   const route = useRoute<ProductDetailsRouteProp>();
@@ -43,9 +56,13 @@ const ProductDetails = () => {
   const isFavorite = useAppSelector(productSelectors.selectIsFavorite(product.id));
   const cartQty = useAppSelector(productSelectors.selectCartQuantity(product.id));
 
-  const hasDiscount = product.discountPercentage > 0;
-  const discountedPrice = product.price - (product.price * product.discountPercentage) / 100;
-  const inStock = product.stock > 0; 
+  const amount = parseFloat(product.amount);
+  const offerPrice = parseFloat(product.offer_price);
+  const offer = parseFloat(product.offer);
+  const hasDiscount = offer > 0;
+  const thumbnail = getFirstPhoto(product.photos);
+  const available = parseInt(product.available, 10) || 0;
+  const inStock = available > 0;
 
   return (
     <SafeAreaView className="flex-1" style={{ backgroundColor: COLORS.background }}>
@@ -70,7 +87,7 @@ const ProductDetails = () => {
 
       <ScrollView contentContainerStyle={{ paddingBottom: 100 }} showsVerticalScrollIndicator={false}>
         <Image
-          source={{ uri: product.thumbnail }}
+          source={{ uri: thumbnail }}
           className="w-full h-72"
           resizeMode="cover"
           style={{ backgroundColor: COLORS.borderLight }}
@@ -93,7 +110,7 @@ const ProductDetails = () => {
                 style={{ backgroundColor: inStock ? COLORS.success : COLORS.error }}
               />
               <Text className="text-xs font-medium" style={{ color: inStock ? COLORS.success : COLORS.error }}>
-                {inStock ? `In Stock (${product.stock})` : 'Out of Stock'}
+                {inStock ? `In Stock (${available})` : 'Out of Stock'}
               </Text>
             </View>
           </View>
@@ -103,24 +120,24 @@ const ProductDetails = () => {
           </Text>
 
           <View className="flex-row items-center mt-1.5">
-            <Ionicons name="star" size={14} color={COLORS.star} />
+            <Ionicons name="business-outline" size={14} color={COLORS.textSecondary} />
             <Text className="text-sm ml-1" style={{ color: COLORS.textSecondary }}>
-              {product.rating.toFixed(1)} rating
+              {product.manufacturer}
             </Text>
           </View>
 
           <View className="flex-row items-end mt-3">
             <Text className="text-2xl font-bold" style={{ color: COLORS.text }}>
-              ${discountedPrice.toFixed(2)}
+              ₹{offerPrice.toFixed(2)}
             </Text>
             {hasDiscount && (
               <>
                 <Text className="text-sm line-through ml-2 mb-1" style={{ color: COLORS.textMuted }}>
-                  ${product.price.toFixed(2)}
+                  ₹{amount.toFixed(2)}
                 </Text>
                 <View className="ml-2 mb-1 px-2 py-0.5 rounded-full" style={{ backgroundColor: COLORS.error }}>
                   <Text className="text-[10px] font-bold text-white">
-                    -{Math.round(product.discountPercentage)}%
+                    -{Math.round(offer)}%
                   </Text>
                 </View>
               </>
@@ -170,4 +187,4 @@ const ProductDetails = () => {
   );
 };
 
-export default ProductDetails;
+export default ProductDetails; 

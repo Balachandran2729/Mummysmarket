@@ -21,6 +21,19 @@ interface ProductCardProps {
 
 type NavigationProp = StackNavigationProp<AppStackParamList>;
 
+const getFirstPhoto = (photos: string): string | undefined => {
+  try {
+    const parsed = JSON.parse(photos);
+    if (Array.isArray(parsed) && parsed.length > 0) {
+      // API sometimes leaves a trailing comma inside the URL string
+      return String(parsed[0]).replace(/,+$/, '').trim();
+    }
+  } catch {
+    // ignore malformed photos
+  }
+  return undefined;
+};
+
 const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const navigation = useNavigation<NavigationProp>();
   const dispatch = useAppDispatch();
@@ -28,8 +41,11 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const cartQty = useAppSelector(productSelectors.selectCartQuantity(product.id));
   const posthog = usePostHog();
 
-  const hasDiscount = product.discountPercentage > 0;
-  const discountedPrice = product.price - (product.price * product.discountPercentage) / 100;
+  const amount = parseFloat(product.amount);
+  const offerPrice = parseFloat(product.offer_price);
+  const offer = parseFloat(product.offer);
+  const hasDiscount = offer > 0;
+  const thumbnail = getFirstPhoto(product.photos);
 
     const handlePress = (product: Product) => {
 
@@ -62,7 +78,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     >
       <View>
         <Image
-          source={{ uri: product.thumbnail }}
+          source={{ uri: thumbnail }}
           className="w-full h-32"
           resizeMode="cover"
           style={{ backgroundColor: COLORS.borderLight }}
@@ -74,7 +90,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             style={{ backgroundColor: COLORS.error }}
           >
             <Text className="text-[10px] font-bold text-white">
-              -{Math.round(product.discountPercentage)}%
+              -{Math.round(offer)}%
             </Text>
           </View>
         )}
@@ -115,23 +131,23 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         </Text>
 
         <View className="flex-row items-center mt-1.5">
-          <Ionicons name="star" size={12} color={COLORS.star} />
+          <Ionicons name="cube-outline" size={12} color={COLORS.textMuted} />
           <Text className="text-xs ml-1" style={{ color: COLORS.textSecondary }}>
-            {product.rating.toFixed(1)}
+            {product.available} left
           </Text>
         </View>
 
         <View className="flex-row items-center justify-between mt-2">
           <View>
             <Text className="text-base font-bold" style={{ color: COLORS.text }}>
-              ${discountedPrice.toFixed(2)}
+              ₹{offerPrice.toFixed(2)}
             </Text>
             {hasDiscount && (
               <Text
                 className="text-[11px] line-through"
                 style={{ color: COLORS.textMuted }}
               >
-                ${product.price.toFixed(2)}
+                ₹{amount.toFixed(2)}
               </Text>
             )}
           </View>

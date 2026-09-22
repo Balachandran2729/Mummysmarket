@@ -9,17 +9,16 @@ export const selectProducts = (state: RootState) =>
 export const selectProductsLoading = (state: RootState) => state.products.loading;
 export const selectProductsError = (state: RootState) => state.products.error;
 export const selectProductsData = (state: RootState) => state.products.data;
-export const selectProductsTotal = (state: RootState) => state.products.data?.total ?? 0;
-export const selectProductsSkip = (state: RootState) => state.products.data?.skip ?? 0;
-export const selectProductsLimit = (state: RootState) => state.products.data?.limit ?? 10;
+export const selectProductsTotal = (state: RootState) =>
+  state.products.data?.total_products ?? 0;
 
 // Favorites
-export const selectIsFavorite = (id: number) => (state: RootState) =>
+export const selectIsFavorite = (id: string) => (state: RootState) =>
   state.favorites.items.some((p) => p.id === id);
 export const selectFavoriteCount = (state: RootState) => state.favorites.items.length;
 
 // Cart
-export const selectCartQuantity = (id: number) => (state: RootState) =>
+export const selectCartQuantity = (id: string) => (state: RootState) =>
   state.cart.items.find((i) => i.product.id === id)?.quantity ?? 0;
 export const selectCartCount = (state: RootState) =>
   state.cart.items.reduce((sum, i) => sum + i.quantity, 0);
@@ -28,6 +27,9 @@ export const selectCartCount = (state: RootState) =>
 
 export const selectCartItems = (state: RootState) => state.cart.items;
 export const selectCartTotal = (state: RootState) =>
-  state.cart.items.reduce((sum, i) => sum + i.product.price * i.quantity, 0);
+  state.cart.items.reduce(
+    (sum, i) => sum + parseFloat(i.product.offer_price) * i.quantity,
+    0
+  );
 
 export const selectFavoriteItems = (state: RootState) => state.favorites.items;
