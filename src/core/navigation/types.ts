@@ -5,6 +5,7 @@ export type AppStackParamList = {
   MainTabs: undefined;
   ProductDetails: { product: Product };
   SaveProduct: undefined;
+  CashbackDetails : undefined ; 
 };
 
 export type TabParamList = {

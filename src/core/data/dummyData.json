@@ -1,0 +1,452 @@
+{
+  "customer": {
+    "name": "Vivek",
+    "mmId": 778891234
+  },
+  "cashbackSummary": {
+    "totalCashbackAllVendors": 412.9,
+    "note": "Cashback is vendor-specific and cannot be transferred."
+  },
+  "cashbackListing": [
+    {
+      "vendorId": 1,
+      "vendorName": "Aria",
+      "image": "https://res.cloudinary.com/rzvlskrc/image/upload/v1790140181/Aria.png",
+      "cashbackAmount": 68.7,
+      "expiresInDays": 120,
+      "expiryDate": "2026-11-20"
+    },
+    {
+      "vendorId": 2,
+      "vendorName": "Little Splashes Aquatics",
+      "image": "https://res.cloudinary.com/rzvlskrc/image/upload/v1790140427/Little_Splashes_Aquatics.png",
+      "cashbackAmount": 25.0,
+      "expiresInDays": 60,
+      "expiryDate": "2026-11-21"
+    },
+    {
+      "vendorId": 3,
+      "vendorName": "Star Learners Child Care",
+      "image": "https://res.cloudinary.com/rzvlskrc/image/upload/v1790140419/Star_Learners_Child_Care.png",
+      "cashbackAmount": 12.4,
+      "expiresInDays": 30,
+      "expiryDate": "2026-10-22"
+    },
+    {
+      "vendorId": 4,
+      "vendorName": "Pnsg New Logo",
+      "image": "https://res.cloudinary.com/rzvlskrc/image/upload/v1790140419/pnsg-new-logo.png",
+      "cashbackAmount": 22.6,
+      "expiresInDays": 90,
+      "expiryDate": "2026-12-21"
+    },
+    {
+      "vendorId": 5,
+      "vendorName": "Jevonbaby Logo",
+      "image": "https://res.cloudinary.com/rzvlskrc/image/upload/v1790140417/jevonbaby-logo.png",
+      "cashbackAmount": 18.5,
+      "expiresInDays": 75,
+      "expiryDate": "2026-12-06"
+    },
+    {
+      "vendorId": 6,
+      "vendorName": "Thomson Medical 0",
+      "image": "https://res.cloudinary.com/rzvlskrc/image/upload/v1790140416/Thomson_Medical_0.png",
+      "cashbackAmount": 45.0,
+      "expiresInDays": 100,
+      "expiryDate": "2026-12-31"
+    },
+    {
+      "vendorId": 7,
+      "vendorName": "Oommi Logo",
+      "image": "https://res.cloudinary.com/rzvlskrc/image/upload/v1790140415/oommi-logo.png",
+      "cashbackAmount": 9.9,
+      "expiresInDays": 45,
+      "expiryDate": "2026-11-06"
+    },
+    {
+      "vendorId": 8,
+      "vendorName": "Pamper Me Logo With R",
+      "image": "https://res.cloudinary.com/rzvlskrc/image/upload/v1790140414/pamper-me-logo-with-r.png",
+      "cashbackAmount": 33.2,
+      "expiresInDays": 110,
+      "expiryDate": "2027-01-10"
+    },
+    {
+      "vendorId": 9,
+      "vendorName": "Babytoon",
+      "image": "https://res.cloudinary.com/rzvlskrc/image/upload/v1790140412/Babytoon.png",
+      "cashbackAmount": 15.75,
+      "expiresInDays": 50,
+      "expiryDate": "2026-11-11"
+    },
+    {
+      "vendorId": 10,
+      "vendorName": "BabySWIPE",
+      "image": "https://res.cloudinary.com/rzvlskrc/image/upload/v1790140410/BabySWIPE.png",
+      "cashbackAmount": 27.3,
+      "expiresInDays": 65,
+      "expiryDate": "2026-11-26"
+    },
+    {
+      "vendorId": 11,
+      "vendorName": "Logo Landscape Eyes",
+      "image": "https://res.cloudinary.com/rzvlskrc/image/upload/v1790140411/logo-landscape-eyes.png",
+      "cashbackAmount": 40.0,
+      "expiresInDays": 95,
+      "expiryDate": "2026-12-26"
+    },
+    {
+      "vendorId": 12,
+      "vendorName": "Bebe Bamboo",
+      "image": "https://res.cloudinary.com/rzvlskrc/image/upload/v1790140402/Bebe_Bamboo.png",
+      "cashbackAmount": 8.6,
+      "expiresInDays": 20,
+      "expiryDate": "2026-10-12"
+    },
+    {
+      "vendorId": 13,
+      "vendorName": "Babylove",
+      "image": "https://res.cloudinary.com/rzvlskrc/image/upload/v1790140402/Babylove.png",
+      "cashbackAmount": 21.15,
+      "expiresInDays": 80,
+      "expiryDate": "2026-12-11"
+    },
+    {
+      "vendorId": 14,
+      "vendorName": "Bambo Nature",
+      "image": "https://res.cloudinary.com/rzvlskrc/image/upload/v1790140402/Bambo_Nature.png",
+      "cashbackAmount": 55.4,
+      "expiresInDays": 130,
+      "expiryDate": "2027-01-30"
+    },
+    {
+      "vendorId": 15,
+      "vendorName": "Haenim Logo",
+      "image": "https://res.cloudinary.com/rzvlskrc/image/upload/v1790140402/Haenim_Logo.png",
+      "cashbackAmount": 29.45,
+      "expiresInDays": 70,
+      "expiryDate": "2026-12-01"
+    }
+  ],
+  "cashbackDetails": [
+    {
+      "vendorId": 1,
+      "vendorName": "Aria",
+      "image": "https://res.cloudinary.com/rzvlskrc/image/upload/v1790140181/Aria.png",
+      "availableCashback": 68.7,
+      "expiresInDays": 120,
+      "expiryDate": "2026-11-20",
+      "history": [
+        {
+          "date": "2026-07-20",
+          "type": "purchase",
+          "label": "Purchase at Baby Fair",
+          "amount": 15.0,
+          "purchaseAmount": 300.0,
+          "expiryDate": "2026-11-20"
+        },
+        {
+          "date": "2026-07-10",
+          "type": "redemption",
+          "label": "Used as Discount",
+          "amount": -50.0,
+          "receiptNo": "12345",
+          "remainingBalance": 53.7
+        },
+        {
+          "date": "2026-06-30",
+          "type": "purchase",
+          "label": "Purchase at Baby Fair",
+          "amount": 38.7,
+          "purchaseAmount": 774.0,
+          "expiryDate": "2026-10-30"
+        }
+      ]
+    },
+    {
+      "vendorId": 2,
+      "vendorName": "Little Splashes Aquatics",
+      "image": "https://res.cloudinary.com/rzvlskrc/image/upload/v1790140427/Little_Splashes_Aquatics.png",
+      "availableCashback": 25.0,
+      "expiresInDays": 60,
+      "expiryDate": "2026-11-21",
+      "history": [
+        {
+          "date": "2026-07-23",
+          "type": "purchase",
+          "label": "Purchase at Baby Fair",
+          "amount": 25.0,
+          "purchaseAmount": 500.0,
+          "expiryDate": "2026-11-21"
+        }
+      ]
+    },
+    {
+      "vendorId": 3,
+      "vendorName": "Star Learners Child Care",
+      "image": "https://res.cloudinary.com/rzvlskrc/image/upload/v1790140419/Star_Learners_Child_Care.png",
+      "availableCashback": 12.4,
+      "expiresInDays": 30,
+      "expiryDate": "2026-10-22",
+      "history": [
+        {
+          "date": "2026-09-22",
+          "type": "purchase",
+          "label": "Purchase at Baby Fair",
+          "amount": 12.4,
+          "purchaseAmount": 124.0,
+          "expiryDate": "2026-10-22"
+        }
+      ]
+    },
+    {
+      "vendorId": 4,
+      "vendorName": "Pnsg New Logo",
+      "image": "https://res.cloudinary.com/rzvlskrc/image/upload/v1790140419/pnsg-new-logo.png",
+      "availableCashback": 22.6,
+      "expiresInDays": 90,
+      "expiryDate": "2026-12-21",
+      "history": [
+        {
+          "date": "2026-09-22",
+          "type": "purchase",
+          "label": "Purchase at Baby Fair",
+          "amount": 22.6,
+          "purchaseAmount": 452.0,
+          "expiryDate": "2026-12-21"
+        }
+      ]
+    },
+    {
+      "vendorId": 5,
+      "vendorName": "Jevonbaby Logo",
+      "image": "https://res.cloudinary.com/rzvlskrc/image/upload/v1790140417/jevonbaby-logo.png",
+      "availableCashback": 18.5,
+      "expiresInDays": 75,
+      "expiryDate": "2026-12-06",
+      "history": [
+        {
+          "date": "2026-08-15",
+          "type": "purchase",
+          "label": "Purchase at Baby Fair",
+          "amount": 30.0,
+          "purchaseAmount": 600.0,
+          "expiryDate": "2026-12-06"
+        },
+        {
+          "date": "2026-09-01",
+          "type": "redemption",
+          "label": "Used as Discount",
+          "amount": -11.5,
+          "receiptNo": "12678",
+          "remainingBalance": 18.5
+        }
+      ]
+    },
+    {
+      "vendorId": 6,
+      "vendorName": "Thomson Medical 0",
+      "image": "https://res.cloudinary.com/rzvlskrc/image/upload/v1790140416/Thomson_Medical_0.png",
+      "availableCashback": 45.0,
+      "expiresInDays": 100,
+      "expiryDate": "2026-12-31",
+      "history": [
+        {
+          "date": "2026-09-13",
+          "type": "purchase",
+          "label": "Purchase at Baby Fair",
+          "amount": 45.0,
+          "purchaseAmount": 900.0,
+          "expiryDate": "2026-12-31"
+        }
+      ]
+    },
+    {
+      "vendorId": 7,
+      "vendorName": "Oommi Logo",
+      "image": "https://res.cloudinary.com/rzvlskrc/image/upload/v1790140415/oommi-logo.png",
+      "availableCashback": 9.9,
+      "expiresInDays": 45,
+      "expiryDate": "2026-11-06",
+      "history": [
+        {
+          "date": "2026-07-28",
+          "type": "purchase",
+          "label": "Purchase at Baby Fair",
+          "amount": 20.0,
+          "purchaseAmount": 200.0,
+          "expiryDate": "2026-11-06"
+        },
+        {
+          "date": "2026-08-20",
+          "type": "redemption",
+          "label": "Used as Discount",
+          "amount": -10.1,
+          "receiptNo": "12789",
+          "remainingBalance": 9.9
+        }
+      ]
+    },
+    {
+      "vendorId": 8,
+      "vendorName": "Pamper Me Logo With R",
+      "image": "https://res.cloudinary.com/rzvlskrc/image/upload/v1790140414/pamper-me-logo-with-r.png",
+      "availableCashback": 33.2,
+      "expiresInDays": 110,
+      "expiryDate": "2027-01-10",
+      "history": [
+        {
+          "date": "2026-09-03",
+          "type": "purchase",
+          "label": "Purchase at Baby Fair",
+          "amount": 33.2,
+          "purchaseAmount": 664.0,
+          "expiryDate": "2027-01-10"
+        }
+      ]
+    },
+    {
+      "vendorId": 9,
+      "vendorName": "Babytoon",
+      "image": "https://res.cloudinary.com/rzvlskrc/image/upload/v1790140412/Babytoon.png",
+      "availableCashback": 15.75,
+      "expiresInDays": 50,
+      "expiryDate": "2026-11-11",
+      "history": [
+        {
+          "date": "2026-07-13",
+          "type": "purchase",
+          "label": "Purchase at Baby Fair",
+          "amount": 25.75,
+          "purchaseAmount": 515.0,
+          "expiryDate": "2026-11-11"
+        },
+        {
+          "date": "2026-08-05",
+          "type": "redemption",
+          "label": "Used as Discount",
+          "amount": -10.0,
+          "receiptNo": "12890",
+          "remainingBalance": 15.75
+        }
+      ]
+    },
+    {
+      "vendorId": 10,
+      "vendorName": "BabySWIPE",
+      "image": "https://res.cloudinary.com/rzvlskrc/image/upload/v1790140410/BabySWIPE.png",
+      "availableCashback": 27.3,
+      "expiresInDays": 65,
+      "expiryDate": "2026-11-26",
+      "history": [
+        {
+          "date": "2026-08-23",
+          "type": "purchase",
+          "label": "Purchase at Baby Fair",
+          "amount": 27.3,
+          "purchaseAmount": 546.0,
+          "expiryDate": "2026-11-26"
+        }
+      ]
+    },
+    {
+      "vendorId": 11,
+      "vendorName": "Logo Landscape Eyes",
+      "image": "https://res.cloudinary.com/rzvlskrc/image/upload/v1790140411/logo-landscape-eyes.png",
+      "availableCashback": 40.0,
+      "expiresInDays": 95,
+      "expiryDate": "2026-12-26",
+      "history": [
+        {
+          "date": "2026-09-18",
+          "type": "purchase",
+          "label": "Purchase at Baby Fair",
+          "amount": 40.0,
+          "purchaseAmount": 800.0,
+          "expiryDate": "2026-12-26"
+        }
+      ]
+    },
+    {
+      "vendorId": 12,
+      "vendorName": "Bebe Bamboo",
+      "image": "https://res.cloudinary.com/rzvlskrc/image/upload/v1790140402/Bebe_Bamboo.png",
+      "availableCashback": 8.6,
+      "expiresInDays": 20,
+      "expiryDate": "2026-10-12",
+      "history": [
+        {
+          "date": "2026-09-02",
+          "type": "purchase",
+          "label": "Purchase at Baby Fair",
+          "amount": 8.6,
+          "purchaseAmount": 172.0,
+          "expiryDate": "2026-10-12"
+        }
+      ]
+    },
+    {
+      "vendorId": 13,
+      "vendorName": "Babylove",
+      "image": "https://res.cloudinary.com/rzvlskrc/image/upload/v1790140402/Babylove.png",
+      "availableCashback": 21.15,
+      "expiresInDays": 80,
+      "expiryDate": "2026-12-11",
+      "history": [
+        {
+          "date": "2026-08-30",
+          "type": "purchase",
+          "label": "Purchase at Baby Fair",
+          "amount": 35.15,
+          "purchaseAmount": 703.0,
+          "expiryDate": "2026-12-11"
+        },
+        {
+          "date": "2026-09-10",
+          "type": "redemption",
+          "label": "Used as Discount",
+          "amount": -14.0,
+          "receiptNo": "12991",
+          "remainingBalance": 21.15
+        }
+      ]
+    },
+    {
+      "vendorId": 14,
+      "vendorName": "Bambo Nature",
+      "image": "https://res.cloudinary.com/rzvlskrc/image/upload/v1790140402/Bambo_Nature.png",
+      "availableCashback": 55.4,
+      "expiresInDays": 130,
+      "expiryDate": "2027-01-30",
+      "history": [
+        {
+          "date": "2026-09-14",
+          "type": "purchase",
+          "label": "Purchase at Baby Fair",
+          "amount": 55.4,
+          "purchaseAmount": 1108.0,
+          "expiryDate": "2027-01-30"
+        }
+      ]
+    },
+    {
+      "vendorId": 15,
+      "vendorName": "Haenim Logo",
+      "image": "https://res.cloudinary.com/rzvlskrc/image/upload/v1790140402/Haenim_Logo.png",
+      "availableCashback": 29.45,
+      "expiresInDays": 70,
+      "expiryDate": "2026-12-01",
+      "history": [
+        {
+          "date": "2026-08-27",
+          "type": "purchase",
+          "label": "Purchase at Baby Fair",
+          "amount": 29.45,
+          "purchaseAmount": 589.0,
+          "expiryDate": "2026-12-01"
+        }
+      ]
+    }
+  ]
+}

@@ -10,6 +10,8 @@ import HomeScreen from '../../feature/home/HomeScreen';
 import CartScreen from '../../feature/cart/CartScreen';
 import ProductDetails from '../../feature/home/ProdectDetails';
 import SaveProduct from '../../feature/cart/SaveProdect';
+import CashbackListScreen from '../../feature/mm/CashbachListes';
+import CashbackDetailsScreen from '../../feature/mm/CashbackDetails'
 import Login from '../../feature/login/Login';
 
 const Tab = createBottomTabNavigator();
@@ -62,6 +64,22 @@ const TabNavigation = () => {
           ),
         }}
       />
+
+      <Tab.Screen
+        name="Cashback"
+        component={CashbackListScreen}
+        options={{
+          tabBarIcon: ({ focused }) => (
+            <View>
+              <MaterialIcons
+                name="add-shopping-cart"
+                size={26}
+                color={COLORS.primaryDark}
+              />
+            </View>
+          ),
+        }}
+      />
     </Tab.Navigator>
   );
 }
@@ -83,6 +101,15 @@ const AppNavigator = () => {
             ...TransitionPresets.SlideFromRightIOS,
         }}
       />
+
+      <AppStack.Screen
+        name="CashbackDetails"
+        component={CashbackDetailsScreen}
+        options={{
+            ...TransitionPresets.SlideFromRightIOS,
+        }}
+      />
+
       <AppStack.Screen
         name="SaveProduct"
         component={SaveProduct}
