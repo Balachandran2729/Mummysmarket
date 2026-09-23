@@ -38,7 +38,7 @@ const CashbackListScreen = () => {
   const vendors: VendorCashback[] = cashbackData.cashbackListing;
 
   const totalCashbackAllVendors = vendors.reduce( (sum, vendor) => sum + vendor.cashbackAmount, 0 );
-
+ 
   const renderItem = ({ item }: { item: VendorCashback }) => (
     <TouchableOpacity
       className="flex-row items-center p-3 mb-2"
@@ -48,7 +48,7 @@ const CashbackListScreen = () => {
       }
     >
       <Image
-        source={{ uri: item.image }}
+        source={{ uri: item.image }} 
         style={{
           width: 130,
           height: 40,
@@ -99,7 +99,7 @@ const CashbackListScreen = () => {
 
       <FlatList
         data={vendors}
-        keyExtractor={(item) => item.vendorId}
+        keyExtractor={(item) => item.vendorId.toString()}
         renderItem={renderItem}
         contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 24 }}
         showsVerticalScrollIndicator={false}
