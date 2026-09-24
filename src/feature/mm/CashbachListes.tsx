@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import cashbackData from '../../core/data/dummyData.json';
+import CountUp from '../../core/common/CountUp';
 
 type RootStackParamList = {
   CashbackList: undefined;
@@ -90,9 +91,10 @@ const CashbackListScreen = () => {
         <Text className="text-md text-gray-900 mb-1 font-medium">
           Total Cashback (All Vendors)
         </Text>
-        <Text className="text-[34px] font-bold text-rose-500 mb-1.5">
-          ${totalCashbackAllVendors.toFixed(2)}
-        </Text>
+        <CountUp
+            value={totalCashbackAllVendors}
+            className="text-[32px] font-bold text-rose-500"
+          />
         <Text className="text-md text-gray-900  mb-1 font-medium">{note}</Text>
       </View>
 
