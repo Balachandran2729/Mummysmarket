@@ -1,5 +1,12 @@
 import React, { useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, Image } from 'react-native';
+import {
+  View,
+  Text,
+  FlatList,
+  ScrollView,
+  TouchableOpacity,
+  Image,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
@@ -33,6 +40,22 @@ interface VendorDetails {
   history: HistoryItem[];
 }
 
+// Same palette as the list screen (move to a shared file if you like)
+const COLORS = {
+  bg: '#FFF9F5',
+  pink: '#FF6F9C',
+  pinkSoft: '#FFE8F0',
+  text: '#4A3B47',
+  subtext: '#8C7A88',
+  border: '#FFE0EA',
+  green: '#2E9E6B',
+  greenSoft: '#E4F8EF',
+  orange: '#E07B2E',
+  orangeSoft: '#FFE9D6',
+  blue: '#3B8FE0',
+  blueSoft: '#E3F2FD',
+};
+
 const formatDate = (date: string) => {
   const d = new Date(date);
   return d.toLocaleDateString('en-GB', {
@@ -41,6 +64,28 @@ const formatDate = (date: string) => {
     year: 'numeric',
   });
 };
+
+// Small icon + text pill used inside history cards
+const Chip = ({
+  icon,
+  text,
+}: {
+  icon: React.ComponentProps<typeof Ionicons>['name'];
+  text: string;
+}) => (
+  <View
+    className="flex-row items-center rounded-full px-2 py-1 mr-1.5 mt-1.5"
+    style={{ backgroundColor: COLORS.bg, borderWidth: 1, borderColor: COLORS.border }}
+  >
+    <Ionicons name={icon} size={12} color={COLORS.subtext} />
+    <Text
+      className="text-[11px] font-semibold ml-1"
+      style={{ color: COLORS.subtext }}
+    >
+      {text}
+    </Text>
+  </View>
+);
 
 const CashbackDetailsScreen = () => {
   const navigation = useNavigation();
@@ -55,63 +100,26 @@ const CashbackDetailsScreen = () => {
 
   if (!vendor) {
     return (
-      <SafeAreaView className="flex-1 bg-white" edges={['top']}>
-        <Text className="p-5 text-center text-gray-400">
+      <SafeAreaView
+        className="flex-1 items-center justify-center px-8"
+        style={{ backgroundColor: COLORS.bg }}
+        edges={['top']}
+      >
+        <View
+          className="items-center justify-center rounded-full mb-3"
+          style={{ width: 64, height: 64, backgroundColor: COLORS.pinkSoft }}
+        >
+          <Ionicons name="alert-circle-outline" size={32} color={COLORS.pink} />
+        </View>
+        <Text
+          className="text-center text-[15px] font-semibold"
+          style={{ color: COLORS.subtext }}
+        >
           Vendor cashback details not found.
         </Text>
       </SafeAreaView>
     );
   }
-
-  const renderHistoryItem = ({ item }: { item: HistoryItem }) => {
-    const isPurchase = item.type === 'purchase';
-    return (
-      <View className="flex-row justify-between py-3 px-3 border-b border-gray-100">
-        <View className="flex-1">
-          <Text className="text-[12px] font-bold text-gray-500 mb-1">
-            {formatDate(item.date)}
-          </Text>
-          <Text className="text-[18px] font-semibold text-gray-900 mb-2">
-            {item.label}
-          </Text>
-
-          {isPurchase ? (
-            <>
-              <Text className="text-[14px] font-semibold text-gray-700 mb-1">
-                Purchase: ${item.purchaseAmount?.toFixed(2)}
-              </Text>
-              {item.expiryDate && (
-                <Text className="text-[14px] font-semibold text-gray-700 mb-1">
-                  Expires: {formatDate(item.expiryDate)}
-                </Text>
-              )}
-            </>
-          ) : (
-            <>
-              {item.receiptNo && (
-                <Text className="text-[14px] font-semibold text-gray-700 mb-1">
-                  Receipt: {item.receiptNo}
-                </Text>
-              )}
-              {item.remainingBalance !== undefined && (
-                <Text className="text-[14px] font-semibold text-gray-700 mb-1">
-                  Remaining: ${item.remainingBalance.toFixed(2)}
-                </Text>
-              )}
-            </>
-          )}
-        </View>
-
-        <Text
-          className={`text-[16px] font-bold ${
-            isPurchase ? 'text-green-600' : 'text-rose-600'
-          }`}
-        >
-          {isPurchase ? '+' : '-'}${Math.abs(item.amount).toFixed(2)}
-        </Text>
-      </View>
-    );
-  };
 
   const totalEarned = vendor.history
     .filter((h) => h.type === 'purchase')
@@ -123,84 +131,301 @@ const CashbackDetailsScreen = () => {
       .reduce((sum, h) => sum + h.amount, 0)
   );
 
+  const urgent = vendor.expiresInDays <= 7;
+  const accent = urgent ? COLORS.orange : COLORS.green;
+  const accentSoft = urgent ? COLORS.orangeSoft : COLORS.greenSoft;
+
+  // assumes a 30-day window (change 30 if yours differs)
+  const expiryProgress =
+    Math.min(Math.max(vendor.expiresInDays / 30, 0.06), 1) * 100;
+
+  const usedPercent =
+    totalEarned > 0 ? Math.min((totalUsed / totalEarned) * 100, 100) : 0;
+
+  const renderHistoryItem = ({ item }: { item: HistoryItem }) => {
+    const isPurchase = item.type === 'purchase';
+    const tone = isPurchase ? COLORS.green : COLORS.pink;
+    const toneSoft = isPurchase ? COLORS.greenSoft : COLORS.pinkSoft;
+
+    return (
+      <View
+        className="flex-row items-center p-3.5 mb-3 rounded-3xl bg-white shadow-sm"
+        style={{ borderWidth: 1, borderColor: COLORS.border }}
+      >
+        {/* Type icon */}
+        <View
+          className="items-center justify-center rounded-2xl"
+          style={{ width: 46, height: 46, backgroundColor: toneSoft }}
+        >
+          <Ionicons
+            name={isPurchase ? 'bag-check-outline' : 'gift-outline'}
+            size={22}
+            color={tone}
+          />
+        </View>
+
+        {/* Details */}
+        <View className="flex-1 ml-3 mr-2">
+          <Text
+            className="text-[15px] font-bold"
+            style={{ color: COLORS.text }}
+            numberOfLines={1}
+          >
+            {item.label}
+          </Text>
+
+          <View className="flex-row items-center mt-0.5">
+            <Ionicons name="calendar-outline" size={12} color={COLORS.subtext} />
+            <Text
+              className="text-[11px] font-semibold ml-1"
+              style={{ color: COLORS.subtext }}
+            >
+              {formatDate(item.date)}
+            </Text>
+          </View>
+
+          <View className="flex-row flex-wrap">
+            {isPurchase ? (
+              <>
+                {item.purchaseAmount !== undefined && (
+                  <Chip
+                    icon="cart-outline"
+                    text={`Purchase $${item.purchaseAmount.toFixed(2)}`}
+                  />
+                )}
+                {item.expiryDate && (
+                  <Chip
+                    icon="time-outline"
+                    text={`Expires ${formatDate(item.expiryDate)}`}
+                  />
+                )}
+              </>
+            ) : (
+              <>
+                {item.receiptNo && (
+                  <Chip icon="receipt-outline" text={item.receiptNo} />
+                )}
+                {item.remainingBalance !== undefined && (
+                  <Chip
+                    icon="wallet-outline"
+                    text={`Left $${item.remainingBalance.toFixed(2)}`}
+                  />
+                )}
+              </>
+            )}
+          </View>
+        </View>
+
+        {/* Amount pill */}
+        <View
+          className="rounded-full px-2.5 py-1.5"
+          style={{ backgroundColor: toneSoft }}
+        >
+          <Text className="text-[14px] font-extrabold" style={{ color: tone }}>
+            {isPurchase ? '+' : '-'}${Math.abs(item.amount).toFixed(2)}
+          </Text>
+        </View>
+      </View>
+    );
+  };
+
+  // Stat card used in the Summary tab
+  const StatCard = ({
+    icon,
+    label,
+    value,
+    tone,
+    toneSoft,
+  }: {
+    icon: React.ComponentProps<typeof Ionicons>['name'];
+    label: string;
+    value: number;
+    tone: string;
+    toneSoft: string;
+  }) => (
+    <View
+      className="flex-1 p-4 rounded-3xl bg-white shadow-sm"
+      style={{ borderWidth: 1, borderColor: COLORS.border }}
+    >
+      <View
+        className="items-center justify-center rounded-2xl mb-3"
+        style={{ width: 42, height: 42, backgroundColor: toneSoft }}
+      >
+        <Ionicons name={icon} size={22} color={tone} />
+      </View>
+      <Text className="text-[12px] font-semibold" style={{ color: COLORS.subtext }}>
+        {label}
+      </Text>
+      <Text className="text-[22px] font-extrabold" style={{ color: COLORS.text }}>
+        ${value.toFixed(2)}
+      </Text>
+    </View>
+  );
+
   return (
-    <SafeAreaView className="flex-1 bg-white" edges={['top']}>
+    <SafeAreaView
+      className="flex-1"
+      style={{ backgroundColor: COLORS.bg }}
+      edges={['top']}
+    >
       {/* Header */}
       <View className="flex-row items-center justify-between px-4 py-3">
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Ionicons name="chevron-back" size={26} color="#1A1A1A" />
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          className="items-center justify-center rounded-full bg-white shadow-sm"
+          style={{ width: 40, height: 40 }}
+        >
+          <Ionicons name="chevron-back" size={22} color={COLORS.text} />
         </TouchableOpacity>
-        <Text className="text-[17px] font-bold text-gray-900">
+
+        <Text className="text-[18px] font-extrabold" style={{ color: COLORS.text }}>
           {vendor.vendorName}
         </Text>
-        <Text></Text>
+
+        <View style={{ width: 40 }} />
       </View>
 
       {/* Vendor summary card */}
-      <View className="mx-4 mt-2 mb-3 p-4 rounded-2xl bg-rose-50">
+      <View
+        className="mx-4 mt-2 mb-4 p-5 rounded-3xl overflow-hidden"
+        style={{ backgroundColor: COLORS.pinkSoft }}
+      >
+        {/* Decorative bubbles */}
+        <View
+          className="absolute rounded-full"
+          style={{
+            width: 120,
+            height: 120,
+            right: -35,
+            top: -35,
+            backgroundColor: 'rgba(255,255,255,0.55)',
+          }}
+        />
+        <View
+          className="absolute rounded-full"
+          style={{
+            width: 64,
+            height: 64,
+            right: 50,
+            bottom: -24,
+            backgroundColor: 'rgba(255,255,255,0.4)',
+          }}
+        />
+        <Ionicons
+          name="sparkles"
+          size={22}
+          color={COLORS.pink}
+          style={{ position: 'absolute', right: 16, top: 14, opacity: 0.6 }}
+        />
+
         <View className="flex-row items-center">
-          <Image
-            source={{ uri: vendor.image }}
-             style={{
-                width: 130,
-                height: 40,
-              }}
-            resizeMode="contain"
-          />
-          <View className="flex-1 ml-3">
-            <Text className="text-[14px] font-semibold text-gray-900 mb-0.5">
+          <View
+            className="items-center justify-center rounded-2xl bg-white"
+            style={{ width: 96, height: 72 }}
+          >
+            <Image
+              source={{ uri: vendor.image }}
+              style={{ width: 76, height: 36 }}
+              resizeMode="contain"
+            />
+          </View>
+
+          <View className="flex-1 ml-4">
+            <Text
+              className="text-[13px] font-semibold mb-0.5"
+              style={{ color: COLORS.subtext }}
+            >
               Available Cashback
             </Text>
-            <Text className="text-[32px] font-bold text-rose-500">
+            <Text
+              className="text-[32px] font-extrabold"
+              style={{ color: COLORS.pink, lineHeight: 38 }}
+            >
               ${vendor.availableCashback.toFixed(2)}
-            </Text>
-
-            <Text className="text-[12px] font-semibold text-gray-700 mt-3">
-              Expires in {vendor.expiresInDays} days ({formatDate(vendor.expiryDate)})
             </Text>
           </View>
         </View>
+
+        {/* Expiry row */}
+        <View className="flex-row items-center justify-between mt-4">
+          <View
+            className="flex-row items-center rounded-full px-2.5 py-1.5"
+            style={{ backgroundColor: accentSoft }}
+          >
+            <Ionicons
+              name={urgent ? 'alarm-outline' : 'time-outline'}
+              size={14}
+              color={accent}
+            />
+            <Text className="text-[12px] font-bold ml-1" style={{ color: accent }}>
+              {vendor.expiresInDays} days left
+            </Text>
+          </View>
+
+          <View className="flex-row items-center">
+            <Ionicons name="calendar-outline" size={13} color={COLORS.subtext} />
+            <Text
+              className="text-[12px] font-semibold ml-1"
+              style={{ color: COLORS.subtext }}
+            >
+              {formatDate(vendor.expiryDate)}
+            </Text>
+          </View>
+        </View>
+
+        {/* Expiry progress */}
+        <View
+          className="mt-3 rounded-full overflow-hidden"
+          style={{ height: 6, backgroundColor: 'rgba(255,255,255,0.8)' }}
+        >
+          <View
+            className="rounded-full"
+            style={{
+              width: `${expiryProgress}%`,
+              height: 6,
+              backgroundColor: urgent ? '#F59E42' : COLORS.pink,
+            }}
+          />
+        </View>
       </View>
 
-      {/* Tabs */}
-      <View className="flex-row px-4 border-b border-gray-100 mb-2">
-        <TouchableOpacity
-          className="flex-1 items-center pb-2.5"
-          onPress={() => setActiveTab('history')}
-        >
-          <Text
-            className={`text-sm font-semibold ${
-              activeTab === 'history' ? 'text-rose-600' : 'text-gray-900'
-            }`}
-          >
-            History
-          </Text>
-          {activeTab === 'history' && (
-            <View className="mt-1.5 h-0.5 w-full rounded bg-rose-600" />
-          )}
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          className="flex-1 items-center pb-2.5"
-          onPress={() => setActiveTab('summary')}
-        >
-          <Text
-            className={`text-sm font-semibold ${
-              activeTab === 'summary' ? 'text-rose-600' : 'text-gray-900'
-            }`}
-          >
-            Summary
-          </Text>
-          {activeTab === 'summary' && (
-            <View className="mt-1.5 h-0.5 w-full rounded bg-rose-600" />
-          )}
-        </TouchableOpacity>
+      {/* Segmented tabs */}
+      <View
+        className="flex-row mx-4 mb-3 p-1 rounded-2xl bg-white"
+        style={{ borderWidth: 1, borderColor: COLORS.border }}
+      >
+        {(
+          [
+            { key: 'history', label: 'History', icon: 'list-outline' },
+            { key: 'summary', label: 'Summary', icon: 'stats-chart-outline' },
+          ] as const
+        ).map((tab) => {
+          const active = activeTab === tab.key;
+          return (
+            <TouchableOpacity
+              key={tab.key}
+              className="flex-1 flex-row items-center justify-center py-2.5 rounded-xl"
+              style={{ backgroundColor: active ? COLORS.pink : 'transparent' }}
+              activeOpacity={0.8}
+              onPress={() => setActiveTab(tab.key)}
+            >
+              <Ionicons
+                name={tab.icon}
+                size={16}
+                color={active ? '#FFFFFF' : COLORS.subtext}
+              />
+              <Text
+                className="text-[14px] font-bold ml-1.5"
+                style={{ color: active ? '#FFFFFF' : COLORS.subtext }}
+              >
+                {tab.label}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
       </View>
 
-      {/* Content — flex-1 wrapper is the key fix: it always fills the
-          remaining space between the tabs and the button, so the button
-          is pinned to the bottom on BOTH tabs, regardless of how much
-          content there is. */}
+      {/* Content */}
       <View className="flex-1">
         {activeTab === 'history' ? (
           <FlatList
@@ -211,34 +436,91 @@ const CashbackDetailsScreen = () => {
             showsVerticalScrollIndicator={false}
           />
         ) : (
-          <View className="flex-1 px-4 pt-2">
-            <Text className="text-xs text-gray-400 mt-3">Total Earned</Text>
-            <Text className="text-xl font-bold text-gray-900">
-              ${totalEarned.toFixed(2)}
-            </Text>
+          <ScrollView
+            contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 24 }}
+            showsVerticalScrollIndicator={false}
+          >
+            {/* Earned + Used side by side */}
+            <View className="flex-row" style={{ gap: 12 }}>
+              <StatCard
+                icon="trending-up"
+                label="Total Earned"
+                value={totalEarned}
+                tone={COLORS.green}
+                toneSoft={COLORS.greenSoft}
+              />
+              <StatCard
+                icon="gift-outline"
+                label="Total Used"
+                value={totalUsed}
+                tone={COLORS.pink}
+                toneSoft={COLORS.pinkSoft}
+              />
+            </View>
 
-            <Text className="text-xs text-gray-400 mt-3">Total Used</Text>
-            <Text className="text-xl font-bold text-gray-900">
-              ${totalUsed.toFixed(2)}
-            </Text>
+            {/* Available balance */}
+            <View
+              className="mt-3 p-4 rounded-3xl bg-white shadow-sm"
+              style={{ borderWidth: 1, borderColor: COLORS.border }}
+            >
+              <View className="flex-row items-center justify-between">
+                <View className="flex-row items-center">
+                  <View
+                    className="items-center justify-center rounded-2xl mr-3"
+                    style={{
+                      width: 46,
+                      height: 46,
+                      backgroundColor: COLORS.blueSoft,
+                    }}
+                  >
+                    <Ionicons name="wallet-outline" size={23} color={COLORS.blue} />
+                  </View>
+                  <View>
+                    <Text
+                      className="text-[12px] font-semibold"
+                      style={{ color: COLORS.subtext }}
+                    >
+                      Available Balance
+                    </Text>
+                    <Text
+                      className="text-[26px] font-extrabold"
+                      style={{ color: COLORS.text, lineHeight: 30 }}
+                    >
+                      ${vendor.availableCashback.toFixed(2)}
+                    </Text>
+                  </View>
+                </View>
+              </View>
 
-            <Text className="text-xs text-gray-400 mt-3">
-              Available Balance
-            </Text>
-            <Text className="text-xl font-bold text-gray-900">
-              ${vendor.availableCashback.toFixed(2)}
-            </Text>
-          </View>
+              {/* Usage bar */}
+              <View className="flex-row items-center justify-between mt-4 mb-1.5">
+                <Text
+                  className="text-[12px] font-semibold"
+                  style={{ color: COLORS.subtext }}
+                >
+                  Cashback used
+                </Text>
+                <Text className="text-[12px] font-bold" style={{ color: COLORS.pink }}>
+                  {usedPercent.toFixed(0)}%
+                </Text>
+              </View>
+              <View
+                className="rounded-full overflow-hidden"
+                style={{ height: 8, backgroundColor: '#F4EAEE' }}
+              >
+                <View
+                  className="rounded-full"
+                  style={{
+                    width: `${usedPercent}%`,
+                    height: 8,
+                    backgroundColor: COLORS.pink,
+                  }}
+                />
+              </View>
+            </View>
+          </ScrollView>
         )}
       </View>
-
-      {/* Common bottom button - now always pinned to the screen bottom
-          on both tabs, since the sibling content View above is flex-1 */}
-      {/* <TouchableOpacity className="mb-6 py-3 pb-4 items-center bg-white border-t border-gray-200">
-        <Text className="text-rose-600 font-semibold text-[14px]">
-          View All Transactions
-        </Text>
-      </TouchableOpacity> */}
     </SafeAreaView>
   );
 };

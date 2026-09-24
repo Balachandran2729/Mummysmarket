@@ -1,8 +1,10 @@
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import { TextInput, TextInputProps } from 'react-native';
 import Animated, {
   Easing,
+  runOnJS,
   useAnimatedProps,
+  useAnimatedReaction,
   useSharedValue,
   withDelay,
   withTiming,
@@ -10,13 +12,13 @@ import Animated, {
 import { cssInterop } from 'nativewind';
 
 const AnimatedTextInput = Animated.createAnimatedComponent(TextInput);
-
-// lets NativeWind's className work on the animated input
 cssInterop(AnimatedTextInput, { className: 'style' });
+
+const DEFAULT_EASING = Easing.out(Easing.cubic);
 
 interface CountUpProps
   extends Omit<TextInputProps, 'value' | 'defaultValue' | 'editable'> {
-  value: number | string;
+  value: number;
   from?: number;
   duration?: number;
   delay?: number;
@@ -24,63 +26,97 @@ interface CountUpProps
   prefix?: string;
   suffix?: string;
   separator?: boolean;
+  easing?: (t: number) => number;
+  onFinish?: () => void;
+  /**
+   * 0 to 1. Fire onFinish when the number is this far along.
+   * 1 = wait for the very end (default). 0.98 = fire slightly early,
+   * which feels instant because the last few cents are barely visible.
+   */
+  finishAt?: number;
   className?: string;
 }
 
-// 'worklet' lets this function run on the UI thread
 const formatNumber = (
-  n: number | string,
+  n: number,
   decimals: number,
   separator: boolean,
   prefix: string,
   suffix: string
 ) => {
   'worklet';
-  const numericValue = typeof n === 'string' ? Number(n) : n;
-  if (!Number.isFinite(numericValue)) {
-    return `${prefix}${suffix}`;
-  }
-
-  const fixed = numericValue.toFixed(decimals);
+  const fixed = n.toFixed(decimals);
   const [intPart, decPart] = fixed.split('.');
-  const int = separator ? intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',') : intPart;
+  const int = separator
+    ? intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+    : intPart;
   return `${prefix}${decPart ? `${int}.${decPart}` : int}${suffix}`;
 };
 
 const CountUp = ({
   value,
   from = 0,
-  duration = 6500,
-  delay = 1,
+  duration = 4500,
+  delay = 0,
   decimals = 2,
   prefix = '$',
   suffix = '',
   separator = true,
+  easing = DEFAULT_EASING,
+  onFinish,
+  finishAt = 0.95,
   style,
   ...rest
 }: CountUpProps) => {
-  const numericValue = typeof value === 'string' ? Number(value) : value;
   const progress = useSharedValue(from);
+  const startValue = useSharedValue(from);
+  const targetValue = useSharedValue(value);
+  const hasFired = useSharedValue(false);
+
+  const onFinishRef = useRef(onFinish);
+  onFinishRef.current = onFinish;
+  const handleFinish = useCallback(() => {
+    onFinishRef.current?.();
+  }, []);
 
   useEffect(() => {
+    startValue.value = progress.value;
+    targetValue.value = value;
+    hasFired.value = false;
+
     progress.value = withDelay(
       delay,
-      withTiming(numericValue, {
-        duration,
-        easing: Easing.out(Easing.cubic), // fast start, long smooth slow-down
+      withTiming(value, { duration, easing }, (finished) => {
+        // fallback: fires at the very end if it hasn't fired early
+        if (finished && !hasFired.value) {
+          hasFired.value = true;
+          runOnJS(handleFinish)();
+        }
       })
     );
-  }, [numericValue, duration, delay]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value, duration, delay]);
+
+  // Fires onFinish early once the number is `finishAt` of the way there
+  useAnimatedReaction(
+    () => {
+      const total = targetValue.value - startValue.value;
+      return total === 0 ? 0 : (progress.value - startValue.value) / total;
+    },
+    (ratio) => {
+      if (finishAt < 1 && !hasFired.value && ratio >= finishAt) {
+        hasFired.value = true;
+        runOnJS(handleFinish)();
+      }
+    }
+  );
 
   const animatedProps = useAnimatedProps(() => {
     const text = formatNumber(progress.value, decimals, separator, prefix, suffix);
-    // `text` isn't in TextInput's types, so we cast
     return { text, defaultValue: text } as any;
   });
 
-  // The final value is used as the initial text, so the input is measured at
-  // its full width and the growing digits never get clipped.
-  const finalText = formatNumber(numericValue, decimals, separator, prefix, suffix);
+  const finalText = formatNumber(value, decimals, separator, prefix, suffix);
 
   return (
     <AnimatedTextInput
