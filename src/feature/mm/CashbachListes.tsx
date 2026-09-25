@@ -79,191 +79,248 @@ const CashbackListScreen = () => {
     // Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
   }, []);
 
-  const renderItem = ({ item, index }: { item: VendorCashback; index: number }) => {
-    const urgent = item.expiresInDays <= 7;
-    const accent = urgent ? '#E07B2E' : '#2E9E6B';
-    const accentSoft = urgent ? '#FFE9D6' : '#E4F8EF';
+ const renderItem = ({ item, index }: { item: VendorCashback; index: number }) => {
+  const urgent = item.expiresInDays <= 7;
+  const accent = urgent ? '#E07B2E' : '#2E9E6B';
+  const accentSoft = urgent ? '#FFE9D6' : '#E4F8EF';
 
-    // progress bar: assumes a 30-day cashback window (change 30 if yours differs)
-    const progress = Math.min(Math.max(item.expiresInDays / 30, 0.06), 1) * 100;
+  const progress =
+    Math.min(Math.max(item.expiresInDays / 30, 0.06), 1) * 100;
 
-    return (
-      <TouchableOpacity
-        className="mb-3 rounded-3xl bg-white shadow-sm"
-        style={{ borderWidth: 1, borderColor: COLORS.border }}
-        activeOpacity={0.85}
-        onPress={() =>
-          navigation.navigate('CashbackDetails', { vendorId: item.vendorId })
-        }
-      >
-        {/* ───── Top: logo + vendor + status ───── */}
-        <View className="flex-row items-center p-3">
-          <View
-            className="items-center justify-center rounded-2xl"
+  return (
+    <TouchableOpacity
+      className="mb-2 rounded-2xl bg-white shadow-sm"
+      style={{
+        borderWidth: 1,
+        borderColor: COLORS.border,
+      }}
+      activeOpacity={0.85}
+      onPress={() =>
+        navigation.navigate('CashbackDetails', {
+          vendorId: item.vendorId,
+        })
+      }
+    >
+      {/* Top: logo + vendor + status */}
+      <View className="flex-row items-center p-4">
+        {/* Smaller Logo */}
+        <View
+          className="items-center justify-center rounded-xl"
+          style={{
+            width: 72,
+            height: 56,
+            backgroundColor: TILE_COLORS[index % TILE_COLORS.length],
+          }}
+        >
+          <Image
+            source={{ uri: item.image }}
             style={{
-              width: 100,
-              height: 80,
-              backgroundColor: TILE_COLORS[index % TILE_COLORS.length],
+              width: 56,
+              height: 34,
             }}
+            resizeMode="contain"
+          />
+        </View>
+
+        {/* Vendor */}
+        <View className="flex-1 ml-2">
+          <Text
+            className="text-[14px] font-bold mb-0.5"
+            style={{ color: COLORS.text }}
+            numberOfLines={1}
           >
-            <Image
-              source={{ uri: item.image }}
-              style={{ width: 80, height: 48 }}
-              resizeMode="contain"
+            {item.vendorName}
+          </Text>
+
+          {/* Status */}
+          <View
+            className="flex-row items-center self-start rounded-full px-1.5 py-0.5"
+            style={{ backgroundColor: accentSoft }}
+          >
+            <Ionicons
+              name={urgent ? 'flame' : 'checkmark-circle'}
+              size={12}
+              color={accent}
             />
-          </View>
 
-          <View className="flex-1 ml-2.5">
             <Text
-              className="text-[15px] font-bold mb-1"
-              style={{ color: COLORS.text }}
-              numberOfLines={1}
+              className="text-[12px] font-bold ml-0.5"
+              style={{ color: accent }}
             >
-              {item.vendorName}
+              {urgent ? 'Expiring soon' : 'Active'}
             </Text>
+          </View>
+        </View>
 
+        {/* Arrow */}
+        <View
+          className="items-center justify-center rounded-full"
+          style={{
+            width: 24,
+            height: 24,
+            backgroundColor: COLORS.pinkSoft,
+          }}
+        >
+          <Ionicons
+            name="chevron-forward"
+            size={13}
+            color={COLORS.pink}
+          />
+        </View>
+      </View>
+
+      {/* Ticket divider */}
+      <View
+        style={{
+          height: 12,
+          justifyContent: 'center',
+        }}
+      >
+        {/* Left notch */}
+        <View
+          style={{
+            position: 'absolute',
+            left: -8,
+            width: 16,
+            height: 16,
+            borderRadius: 8,
+            backgroundColor: COLORS.bg,
+            borderWidth: 1,
+            borderColor: COLORS.border,
+          }}
+        />
+
+        {/* Right notch */}
+        <View
+          style={{
+            position: 'absolute',
+            right: -8,
+            width: 16,
+            height: 16,
+            borderRadius: 8,
+            backgroundColor: COLORS.bg,
+            borderWidth: 1,
+            borderColor: COLORS.border,
+          }}
+        />
+
+        {/* Dashed line */}
+        <View
+          className="flex-row justify-between"
+          style={{
+            marginHorizontal: 14,
+          }}
+        >
+          {Array.from({ length: 22 }).map((_, i) => (
             <View
-              className="flex-row items-center self-start rounded-full px-2 py-1"
-              style={{ backgroundColor: accentSoft }}
+              key={i}
+              style={{
+                width: 3,
+                height: 1.5,
+                borderRadius: 1,
+                backgroundColor: COLORS.border,
+              }}
+            />
+          ))}
+        </View>
+      </View>
+
+      {/* Bottom */}
+      <View className="px-2 pb-2 pt-1.5">
+        <View className="flex-row items-center justify-between">
+          
+          {/* Cashback Amount */}
+          <View className="flex-row items-center">
+            <View
+              className="items-center justify-center rounded-full mr-1.5"
+              style={{
+                width: 28,
+                height: 28,
+                backgroundColor: COLORS.pinkSoft,
+              }}
             >
               <Ionicons
-                name={urgent ? 'flame' : 'checkmark-circle'}
+                name="wallet-outline"
                 size={12}
-                color={accent}
+                color={COLORS.pink}
               />
+            </View>
+
+            <View>
               <Text
-                className="text-[10px] font-bold ml-1"
-                style={{ color: accent }}
+                className="text-[10px] font-semibold"
+                style={{ color: COLORS.subtext }}
               >
-                {urgent ? 'Expiring soon' : 'Active'}
+                Cashback
+              </Text>
+
+              <Text
+                className="text-[22px] font-extrabold mt-2"
+                style={{
+                  color: COLORS.pink,
+                  lineHeight: 19,
+                }}
+              >
+                ${item.cashbackAmount.toFixed(2)}
               </Text>
             </View>
           </View>
 
-          <View
-            className="items-center justify-center rounded-full"
-            style={{ width: 28, height: 28, backgroundColor: COLORS.pinkSoft }}
-          >
-            <Ionicons name="chevron-forward" size={16} color={COLORS.pink} />
-          </View>
-        </View>
-
-        {/* ───── Ticket divider (dashed line + side notches) ───── */}
-        <View style={{ height: 18, justifyContent: 'center' }}>
-          <View
-            style={{
-              position: 'absolute',
-              left: -10,
-              width: 20,
-              height: 20,
-              borderRadius: 10,
-              backgroundColor: COLORS.bg,
-              borderWidth: 1,
-              borderColor: COLORS.border,
-            }}
-          />
-          <View
-            style={{
-              position: 'absolute',
-              right: -10,
-              width: 20,
-              height: 20,
-              borderRadius: 10,
-              backgroundColor: COLORS.bg,
-              borderWidth: 1,
-              borderColor: COLORS.border,
-            }}
-          />
-          <View
-            className="flex-row justify-between"
-            style={{ marginHorizontal: 18 }}
-          >
-            {Array.from({ length: 24 }).map((_, i) => (
-              <View
-                key={i}
-                style={{
-                  width: 4,
-                  height: 2,
-                  borderRadius: 1,
-                  backgroundColor: COLORS.border,
-                }}
-              />
-            ))}
-          </View>
-        </View>
-
-        {/* ───── Bottom: amount + expiry + progress ───── */}
-        <View className="px-3 pt-2 pb-3">
-          <View className="flex-row items-center justify-between">
-            {/* Amount */}
+          {/* Expiry */}
+          <View className="items-end">
             <View className="flex-row items-center">
-              <View
-                className="items-center justify-center rounded-full mr-2"
-                style={{ width: 34, height: 34, backgroundColor: COLORS.pinkSoft }}
+              <Ionicons
+                name={urgent ? 'alarm-outline' : 'time-outline'}
+                size={12}
+                color={accent}
+              />
+
+              <Text
+                className="text-[10px] font-bold ml-1"
+                style={{ color: accent }}
               >
-                <Ionicons name="wallet-outline" size={18} color={COLORS.pink} />
-              </View>
-              <View>
-                <Text
-                  className="text-[10px] font-semibold"
-                  style={{ color: COLORS.subtext }}
-                >
-                  Cashback
-                </Text>
-                <Text
-                  className="text-[22px] font-extrabold"
-                  style={{ color: COLORS.pink, lineHeight: 26 }}
-                >
-                  ${item.cashbackAmount.toFixed(2)}
-                </Text>
-              </View>
+                {item.expiresInDays} days left
+              </Text>
             </View>
 
-            {/* Expiry */}
-            <View className="items-end">
-              <View className="flex-row items-center">
-                <Ionicons
-                  name={urgent ? 'alarm-outline' : 'time-outline'}
-                  size={13}
-                  color={accent}
-                />
-                <Text
-                  className="text-[12px] font-bold ml-1"
-                  style={{ color: accent }}
-                >
-                  {item.expiresInDays} days left
-                </Text>
-              </View>
-              <View className="flex-row items-center mt-1">
-                <Ionicons name="calendar-outline" size={11} color={COLORS.subtext} />
-                <Text
-                  className="text-[10px] font-medium ml-1"
-                  style={{ color: COLORS.subtext }}
-                >
-                  {formatExpiry(item.expiryDate)}
-                </Text>
-              </View>
-            </View>
-          </View>
+            <View className="flex-row items-center mt-2">
+              <Ionicons
+                name="calendar-outline"
+                size={12}
+                color={COLORS.subtext}
+              />
 
-          {/* Progress bar */}
-          <View
-            className="mt-2 rounded-full overflow-hidden"
-            style={{ height: 5, backgroundColor: '#F4EAEE' }}
-          >
-            <View
-              className="rounded-full"
-              style={{
-                width: `${progress}%`,
-                height: 5,
-                backgroundColor: urgent ? '#F59E42' : COLORS.pink,
-              }}
-            />
+              <Text
+                className="text-[10px] font-medium ml-1"
+                style={{ color: COLORS.subtext }}
+              >
+                {formatExpiry(item.expiryDate)}
+              </Text>
+            </View>
           </View>
         </View>
-      </TouchableOpacity>
-    );
-  };
+
+        {/* Progress */}
+        <View
+          className="mt-2 rounded-full overflow-hidden"
+          style={{
+            height: 3,
+            backgroundColor: '#F4EAEE',
+          }}
+        >
+          <View
+            className="rounded-full"
+            style={{
+              width: `${progress}%`,
+              height: 3,
+              backgroundColor: urgent ? '#F59E42' : COLORS.pink,
+            }}
+          />
+        </View>
+      </View>
+    </TouchableOpacity>
+  );
+};
 
   return (
     <SafeAreaView

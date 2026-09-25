@@ -143,91 +143,119 @@ const CashbackDetailsScreen = () => {
     totalEarned > 0 ? Math.min((totalUsed / totalEarned) * 100, 100) : 0;
 
   const renderHistoryItem = ({ item }: { item: HistoryItem }) => {
-    const isPurchase = item.type === 'purchase';
-    const tone = isPurchase ? COLORS.green : COLORS.pink;
-    const toneSoft = isPurchase ? COLORS.greenSoft : COLORS.pinkSoft;
+  const isPurchase = item.type === 'purchase';
+  const tone = isPurchase ? COLORS.green : COLORS.pink;
+  const toneSoft = isPurchase ? COLORS.greenSoft : COLORS.pinkSoft;
 
-    return (
+  return (
+    <View
+      className="flex-row items-start p-3.5 mb-3 rounded-3xl bg-white shadow-sm"
+      style={{
+        borderWidth: 1,
+        borderColor: COLORS.border,
+      }}
+    >
+      {/* Type icon */}
       <View
-        className="flex-row items-center p-3.5 mb-3 rounded-3xl bg-white shadow-sm"
-        style={{ borderWidth: 1, borderColor: COLORS.border }}
+        className="items-center justify-center rounded-2xl"
+        style={{
+          width: 46,
+          height: 46,
+          backgroundColor: toneSoft,
+        }}
       >
-        {/* Type icon */}
-        <View
-          className="items-center justify-center rounded-2xl"
-          style={{ width: 46, height: 46, backgroundColor: toneSoft }}
+        <Ionicons
+          name={isPurchase ? 'bag-check-outline' : 'gift-outline'}
+          size={22}
+          color={tone}
+        />
+      </View>
+
+      {/* Details */}
+      <View className="flex-1 ml-3 mr-2">
+        <Text
+          className="text-[15px] font-bold"
+          style={{ color: COLORS.text }}
+          numberOfLines={1}
         >
+          {item.label}
+        </Text>
+
+        <View className="flex-row items-center mt-0.5">
           <Ionicons
-            name={isPurchase ? 'bag-check-outline' : 'gift-outline'}
-            size={22}
-            color={tone}
+            name="calendar-outline"
+            size={12}
+            color={COLORS.subtext}
           />
-        </View>
 
-        {/* Details */}
-        <View className="flex-1 ml-3 mr-2">
           <Text
-            className="text-[15px] font-bold"
-            style={{ color: COLORS.text }}
-            numberOfLines={1}
+            className="text-[11px] font-semibold ml-1"
+            style={{ color: COLORS.subtext }}
           >
-            {item.label}
+            {formatDate(item.date)}
           </Text>
-
-          <View className="flex-row items-center mt-0.5">
-            <Ionicons name="calendar-outline" size={12} color={COLORS.subtext} />
-            <Text
-              className="text-[11px] font-semibold ml-1"
-              style={{ color: COLORS.subtext }}
-            >
-              {formatDate(item.date)}
-            </Text>
-          </View>
-
-          <View className="flex-row flex-wrap">
-            {isPurchase ? (
-              <>
-                {item.purchaseAmount !== undefined && (
-                  <Chip
-                    icon="cart-outline"
-                    text={`Purchase $${item.purchaseAmount.toFixed(2)}`}
-                  />
-                )}
-                {item.expiryDate && (
-                  <Chip
-                    icon="time-outline"
-                    text={`Expires ${formatDate(item.expiryDate)}`}
-                  />
-                )}
-              </>
-            ) : (
-              <>
-                {item.receiptNo && (
-                  <Chip icon="receipt-outline" text={item.receiptNo} />
-                )}
-                {item.remainingBalance !== undefined && (
-                  <Chip
-                    icon="wallet-outline"
-                    text={`Left $${item.remainingBalance.toFixed(2)}`}
-                  />
-                )}
-              </>
-            )}
-          </View>
         </View>
 
-        {/* Amount pill */}
+        {/* Chips - ALWAYS ONE ROW */}
         <View
-          className="rounded-full px-2.5 py-1.5"
-          style={{ backgroundColor: toneSoft }}
+          className="flex-row items-center mt-1"
+          style={{
+            flexWrap: 'nowrap',
+          }}
         >
-          <Text className="text-[14px] font-extrabold" style={{ color: tone }}>
-            {isPurchase ? '+' : '-'}${Math.abs(item.amount).toFixed(2)}
-          </Text>
+          {isPurchase ? (
+            <>
+              {item.purchaseAmount !== undefined && (
+                <Chip
+                  icon="cart-outline"
+                  text={`Purchase $${item.purchaseAmount.toFixed(2)}`}
+                />
+              )}
+
+              {item.expiryDate && (
+                <Chip
+                  icon="time-outline"
+                  text={`Expires ${formatDate(item.expiryDate)}`}
+                />
+              )}
+            </>
+          ) : (
+            <>
+              {item.receiptNo && (
+                <Chip
+                  icon="receipt-outline"
+                  text={item.receiptNo}
+                />
+              )}
+
+              {item.remainingBalance !== undefined && (
+                <Chip
+                  icon="wallet-outline"
+                  text={`Left $${item.remainingBalance.toFixed(2)}`}
+                />
+              )}
+            </>
+          )}
         </View>
       </View>
-    );
-  };
+
+      {/* Amount - TOP RIGHT */}
+      <View
+        className="rounded-full px-2.5 py-1.5 self-start"
+        style={{
+          backgroundColor: toneSoft,
+        }}
+      >
+        <Text
+          className="text-[14px] font-extrabold"
+          style={{ color: tone }}
+        >
+          {isPurchase ? '+' : '-'}${Math.abs(item.amount).toFixed(2)}
+        </Text>
+      </View>
+    </View>
+  );
+};
 
   // Stat card used in the Summary tab
   const StatCard = ({
@@ -374,7 +402,7 @@ const CashbackDetailsScreen = () => {
         </View>
 
         {/* Expiry progress */}
-        <View
+        {/* <View
           className="mt-3 rounded-full overflow-hidden"
           style={{ height: 6, backgroundColor: 'rgba(255,255,255,0.8)' }}
         >
@@ -386,7 +414,7 @@ const CashbackDetailsScreen = () => {
               backgroundColor: urgent ? '#F59E42' : COLORS.pink,
             }}
           />
-        </View>
+        </View> */}
       </View>
 
       {/* Segmented tabs */}

@@ -56,7 +56,7 @@ const formatNumber = (
 const CountUp = ({
   value,
   from = 0,
-  duration = 4500,
+  duration = 1500,
   delay = 0,
   decimals = 2,
   prefix = '$',
